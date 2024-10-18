@@ -1,35 +1,37 @@
 import { useContext, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { SocketContext } from "../Context/SocketContext";
+import UserFeedPlayer from "../components/UserFeedPlayer";
 
 const Room: React.FC = () => {
-    
-    const {id} = useParams();
-    const {socket, user} = useContext(SocketContext);
-
-    const fetchParticipantList = ({roomId, participants}: {roomId: string, participants: string[]}) => {
-        console.log("fetch room participants");
-        console.log(roomId, participants);
-    }
-    
+    const { id } = useParams();
+    const { socket, user, stream, peers } = useContext(SocketContext);
 
     useEffect(() => {
-        if (user && user.id) {  // Ensure peerId is available
-            console.log("Emitting join-room event with peerId:", user.id);
-            socket.emit("join-room", { roomId: id, peerId: user.id });
-        } else {
-            console.log("Peer ID not available yet");
+        // Emit event when a user joins the room
+        if (user) {
+            // console.log("User object:", user); // Log the entire user object
+            console.log("New user with id", user._id, "has joined room", id);
+            socket.emit("joined-room", { roomId: id, peerId: user._id });
         }
-        socket.on("get-users", fetchParticipantList)
+        console.log(peers);
         
-    }, [id, user, socket]);  // Depend on `user` to wait for initialization
-    
-    
+    }, [id, user, socket, peers]);
 
-    return(
+    return (
         <div>
-            room : {id}
+            room: {id}
+            <br />
+            Your own user feed
+            <UserFeedPlayer stream={stream} />
+            <div>
+                Other Users feed
+                {Object.keys(peers).map((peerId) => (
+                    <UserFeedPlayer key={peerId} stream={peers[peerId].stream} />
+                ))}
+            </div>
         </div>
     )
 }
+
 export default Room;

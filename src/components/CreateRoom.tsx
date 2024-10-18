@@ -2,18 +2,22 @@ import { useContext } from "react";
 import { SocketContext } from "../Context/SocketContext";
 
 const CreateRoom: React.FC = () => {
+
     const { socket } = useContext(SocketContext);
 
     const initRoom = () => {
-        console.log("initializing a create room request", socket);
-        socket.emit("create-room"); // Corrected event emit
-    };
+        console.log("Initialising a req to create a room", socket)
+        socket.emit("create-room");
+    }
 
     return (
-        <button className="btn btn-secondary" onClick={initRoom}>
+        <button 
+            onClick={initRoom}
+            className="btn btn-secondary"
+        >
             Start a new meeting in a new room
         </button>
-    );
-};
+    )
+}
 
 export default CreateRoom;
